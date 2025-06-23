@@ -3,11 +3,13 @@ import { useQuery } from '@tanstack/react-query';
 import React, { useState } from 'react';
 import { useParams } from 'react-router';
 import useAxiosSecure from '../../../hooks/useAxiosSecure';
+import useAuth from '../../../hooks/useAuth';
 
 const PaymentForm = () => {
     const stripe = useStripe();
     const elements = useElements();
     const { parcelId } = useParams();
+    const { user } = useAuth();
     const axiosSecure = useAxiosSecure();
 
     const [error, setError] = useState('');
@@ -42,6 +44,7 @@ const PaymentForm = () => {
             return;
         }
 
+        // step- 1: validate the card
         const { error, paymentMethod } = await stripe.createPaymentMethod({
             type: 'card',
             card
@@ -53,33 +56,39 @@ const PaymentForm = () => {
         else {
             setError('');
             console.log('payment method', paymentMethod);
-        }
 
-        // step-2: create payment intent
-        const res = await axiosSecure.post('/create-payment-intent', {
-            amountInCents,
-            parcelId
-        })
+            // step-2: create payment intent
+            const res = await axiosSecure.post('/create-payment-intent', {
+                amountInCents,
+                parcelId
+            })
 
-        const clientSecret = res.data.clientSecret;
+            const clientSecret = res.data.clientSecret;
 
-        const result = await stripe.confirmCardPayment(clientSecret, {
-            payment_method: {
-                card: elements.getElement(CardElement),
-                billing_details: {
-                    name: 'Jenny Rosen',
+            // step-3: confirm payment
+            const result = await stripe.confirmCardPayment(clientSecret, {
+                payment_method: {
+                    card: elements.getElement(CardElement),
+                    billing_details: {
+                        name: user.displayName,
+                        email: user.email
+                    },
                 },
-            },
-        });
+            });
 
-        if (result.error) {
-            console.log(result.error.message);
-        } else {
-            if (result.paymentIntent.status === 'succeeded') {
-                console.log('Payment succeeded!');
-                console.log(result)
+            if (result.error) {
+                setError(result.error.message);
+            } else {
+                setError('');
+                if (result.paymentIntent.status === 'succeeded') {
+                    console.log('Payment succeeded!');
+                    console.log(result)
+                    // step-4 mark parcel paid also create payment history
+                }
             }
         }
+
+
 
 
 
