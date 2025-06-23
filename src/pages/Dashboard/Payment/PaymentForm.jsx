@@ -105,7 +105,7 @@ const PaymentForm = () => {
                             confirmButtonText: 'Go to My Parcels',
                         });
 
-                        // ✅ Redirect to /myparcels
+                        // ✅ Redirect to /myParcels
                         navigate('/dashboard/myParcels');
 
                     }
