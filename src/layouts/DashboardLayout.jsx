@@ -9,9 +9,15 @@ import {
   FaSearchLocation,
   FaUserCheck,
   FaHourglassHalf,
+  FaUserShield,
 } from "react-icons/fa";
+import useUserRole from "../hooks/useUserRole";
 
 const DashboardLayout = () => {
+  const { role, roleLoading } = useUserRole();
+
+  console.log(role);
+
   return (
     <div className="drawer lg:drawer-open">
       <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
@@ -84,18 +90,32 @@ const DashboardLayout = () => {
               Update Profile
             </NavLink>
           </li>
-          <li>
-            <NavLink to="/dashboard/active-riders">
-              <FaUserCheck className="inline-block mr-2 text-green-600" />
-              Active Riders
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/dashboard/pending-riders">
-              <FaHourglassHalf className="inline-block mr-2 text-yellow-500" />
-              Pending Riders
-            </NavLink>
-          </li>
+
+          {!roleLoading && role == "admin" && (
+            <>
+              <li>
+                <NavLink to="/dashboard/active-riders">
+                  <FaUserCheck className="inline-block mr-2 text-green-600" />
+                  Active Riders
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to="/dashboard/pending-riders">
+                  <FaHourglassHalf className="inline-block mr-2 text-yellow-500" />
+                  Pending Riders
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/dashboard/make-admin"
+                  className={({ isActive }) => (isActive ? "active" : "")}
+                >
+                  <FaUserShield className="inline-block mr-2" />
+                  Manage Admins
+                </NavLink>
+              </li>
+            </>
+          )}
         </ul>
       </div>
     </div>
