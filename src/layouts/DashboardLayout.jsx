@@ -10,6 +10,7 @@ import {
   FaUserCheck,
   FaHourglassHalf,
   FaUserShield,
+  FaUserPlus,
 } from "react-icons/fa";
 import useUserRole from "../hooks/useUserRole";
 
@@ -93,6 +94,13 @@ const DashboardLayout = () => {
 
           {!roleLoading && role == "admin" && (
             <>
+              <li>
+                <NavLink to="/dashboard/assign-rider">
+                  <FaUserPlus className="inline-block mr-2 text-blue-600" />
+                  Assign Rider
+                </NavLink>
+              </li>
+
               <li>
                 <NavLink to="/dashboard/active-riders">
                   <FaUserCheck className="inline-block mr-2 text-green-600" />
